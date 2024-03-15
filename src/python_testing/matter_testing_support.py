@@ -1097,26 +1097,50 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return info
 
-    def wait_for_user_input(self,
-                            prompt_msg: str,
-                            input_msg: str = "Press Enter when done.\n",
-                            prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> str:
+    def wait_for_user_input(
+        self,
+        prompt_msg: str,
+        input_msg: str = "Press Enter when done.\n",
+        relevant_content: bool = False,
+        prompt_msg_placeholder: str = "Submit anything to continue",
+        default_value: str = "y",
+    ) -> str:
         """Ask for user input and wait for it.
 
         Args:
-            prompt_msg (str): Message for TH UI prompt. Indicates what is expected from the user.
-            input_msg (str, optional): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
-            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Defaults to "Submit anything to continue".
-            default_value (str, optional): TH UI prompt default value. Defaults to "y".
+            prompt_msg (str): Message for TH UI prompt. Indicates what is expected from
+            the user.
+
+            input_msg (str, optional): Prompt for input function, used when running
+            tests manually. Defaults to "Press Enter when done.\\n".
+
+            relevant_content (bool, optional): Whether or not the input content is
+            relevant to the test case. If it is, TH should will display an input prompt,
+            asking for a string. If not, TH will display a message prompt with a button
+            for the user to indicate when the requested action has been performed.
+            Defaults to False.
+
+            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Only
+            applied if relevant_content is True. Defaults to "Submit anything to
+            continue".
+
+            default_value (str, optional): TH UI prompt default value. Only applied if
+            relevant_content is True. Defaults to "y".
+
 
         Returns:
             str: User input
         """
         if self.runner_hook:
-            self.runner_hook.show_prompt(msg=prompt_msg,
-                                         placeholder=prompt_msg_placeholder,
-                                         default_value=default_value)
+            if relevant_content:
+                self.runner_hook.show_input_prompt(
+                    msg=prompt_msg,
+                    placeholder=prompt_msg_placeholder,
+                    default_value=default_value,
+                )
+            else:
+                self.runner_hook.show_message_prompt(msg=prompt_msg)
+
         return input(input_msg)
 
 
